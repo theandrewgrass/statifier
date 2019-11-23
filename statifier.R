@@ -29,7 +29,7 @@ extractGroupsAndMeansFromTTestResults <- function(results) {
 extractGroupNamesFromMeanStrings <- function(mean_strings) {
   group_names <- c()
   
-  for (i in length(mean_strings)) {
+  for (i in 1:length(mean_strings)) {
     group_names <- append(group_names, tail(strsplit(mean_strings, "\\s+")[[i]],n=1))
   }
   
