@@ -7,11 +7,31 @@ library(jsonlite)
 #' @post /twosamplettest/<group>/<variable>
 function(req, group, variable) {
   data_as_df <- fromJSON(req$postBody)
-  group_data <- data_as_df[group]
-  variable_data <- data_as_df[variable]
-  relevant_data <- cbind(group_data, variable_data)
-  colnames(relevant_data) <- c("A", "B")
-  results <- t.test(B ~ A, data=relevant_data, alternative="two.sided", var.equal=FALSE)
-  means <- cbind(results["estimate"], attr(results$estimate, "names"))
-  return(list(pvalue=results$p.value, means=toJSON(cbind(attr(results$estimate, "names"), results$estimate)), stderr=results$stderr))
+
+  results <- t.test(get(variable) ~ get(group), data=data_as_df)
+  
+  group_mean_df <- extractGroupsAndMeansFromTTestResults(results)
+
+  test_results <- list(pvalue=results$p.value, group_stats=as.data.frame(group_mean_df), stderr=results$stderr)
+
+  test_results
+}
+
+extractGroupsAndMeansFromTTestResults <- function(results) {
+  mean_strings <- attr(results$estimate, "names")
+  group <- extractGroupNamesFromMeanStrings(mean_strings)
+  mean <- as.numeric(results$estimate)
+  group_mean_df <- cbind(group, mean)
+
+  group_mean_df
+}
+
+extractGroupNamesFromMeanStrings <- function(mean_strings) {
+  group_names <- c()
+  
+  for (i in length(mean_strings)) {
+    group_names <- append(group_names, tail(strsplit(mean_strings, "\\s+")[[i]],n=1))
+  }
+  
+  group_names
 }
