@@ -1,3 +1,4 @@
+library(plumber)
 library(jsonlite)
 library(glue)
 library(crayon)
@@ -29,7 +30,7 @@ printWithSeparator <- function(content, num_sep_repeat) {
 }
 
 #* Warn user if post request missing body
-#* @filter missingPostBody
+#* @filter missingpostbody
 function(req) {
   if (req$REQUEST_METHOD == "POST" && length(req$postBody) == 0) {
     req$status <- 400
