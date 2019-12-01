@@ -70,3 +70,17 @@ extractGroupNamesFromMeanStrings <- function(mean_strings) {
     group_names <- append(group_names, tail(strsplit(mean_strings, "\\s+")[[i]],n=1))
   }
 }
+
+#' Interweave multiple arrays to get alternating values (to be used with smart table web component)
+#' @json
+#' @post /interweavearrays
+function(req) {
+  parsed_data <- fromJSON(req$postBody)
+  equal_length_df <- ensureEqualColLength(parsed_data)
+  interweaved <- as.vector(t(equal_length_df))
+}
+
+ensureEqualColLength <- function(df) {
+  n <- max(lengths(df))
+  equal_length_df <- as.data.frame(do.call(cbind, lapply(df, `length<-`, n)))
+}
